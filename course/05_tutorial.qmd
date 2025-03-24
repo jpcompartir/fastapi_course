@@ -1,0 +1,53 @@
+# Creating a basic API
+
+::: {.callout-tip}
+A 'path' in the FastAPI sense is often called an endpoint, or a route. Paths separate concerns from one another.
+:::
+
+
+- **Step 1**: import FastAPI (from fastapi)
+- **Step 2**: Create a FastAPI instance
+- **Step 3**: Create a path operation
+- **Step 4**: Define a path operation decorator
+- **Step 5**: Define the path operation function
+- **Step 6**: Return the content
+
+(@) import FastAPI
+
+Boilerplate python code for loading the appropriate library / class:
+`from fastapi import FastAPI`
+
+(@) Create a FastAPI instance
+
+Boilerplate python code for creating an app instance:
+`app = FastAPI()`
+
+(@) Create a path operation
+
+::: {.callout-note title="What is a path operation?" collapse="true"}
+In a URL like: `https://example.com/items/foo`, `items/foo` is the path. The operation in 'path operation' refers to the basic HTTP methods, e.g. ^[There are more exotic methods, but we'll leave them out for now]
+
+- POST - @app.post()
+- GET - @app.get()
+- PUT - @app.put()
+- DELETE - @app.delete()
+:::
+ 
+ @ Define the path operation decorator
+
+`@app.get("/")`
+
+@ Define the path operation function
+This is where we define the logic that will be executed at the path operation location, i.e. we write some Python code that we want to be executed when a user sends an HTTP request to our API.
+
+```{python}
+#| eval: false
+def root():
+    return {"message": "Hello World"}
+```
+
+@ Run the server
+
+```bash
+fastapi dev main.py
+```

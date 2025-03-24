@@ -1,0 +1,422 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"01 Types Write Up\"\n",
+        "---\n",
+        "\n",
+        "Files etc. for:\n",
+        "[FastAPI Course Types](https://fastapi.tiangolo.com/python-types/)\n",
+        "\n",
+        "# Why use type hints?\n",
+        "Let's see what happens when we don't use type hints:\n",
+        "\n",
+        "The get_full_name function is created without type hints. This doesn't stop it working, but it does mean our IDE won't be able to provide us with method hints, and our users won't have direct visibility into how they should use the function."
+      ],
+      "id": "d2b7e33c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def get_full_name(first_name, last_name):\n",
+        "    full_name = first_name.title() + \" \" + last_name.title()\n",
+        "    return full_name\n",
+        "\n",
+        "print(get_full_name(\"john\", \"doe\"))"
+      ],
+      "id": "98dc6bd4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Types of Types\n",
+        "\n",
+        "- **Scalar types**: int, float, bool, bytes\n",
+        "- **Generic types**: dict, list, set, tuple\n",
+        "\n",
+        "\n",
+        "## Scalar Types"
+      ],
+      "id": "88c78548"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def get_full_name(first_name: str, last_name:str):\n",
+        "    full_name = first_name.title() + \" \" + last_name.title()\n",
+        "\n",
+        "    return full_name"
+      ],
+      "id": "0164afbe",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "::: {.callout-tip}\n",
+        "If you're not getting error analysis for this function, add the following lines to your settings.json:\n",
+        "\"python.analysis.typeCheckingMode\": \"basic\",\n",
+        "\"python.linting.enabled\": true\n",
+        ":::\n",
+        "\n",
+        "Now your IDE will anticipate an error before runtime of your function, telling you that this operation won't work with types str and int."
+      ],
+      "id": "875f8f59"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| error: true \n",
+        "def get_name_with_age(name: str, age: int):\n",
+        "    name_with_age = name + \" is this old: \" + age\n",
+        "    return name_with_age\n",
+        "\n",
+        "get_name_with_age(\"john\", 10)"
+      ],
+      "id": "79e87fcd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def get_name_with_age(name: str, age:int) -> str:\n",
+        "    name_with_age = name + \" is this old: \" + str(age)\n",
+        "    return name_with_age"
+      ],
+      "id": "ce229042",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Python 3.9+ introduced 'list' (yes, lowercase) type, so no need for `from typing import List` anymore.\n",
+        "\n",
+        "## List, Set, Dict, Tuple"
+      ],
+      "id": "cd8b6ca8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def process_items_list(items: list[str]):\n",
+        "    for item in items:\n",
+        "        print(item)"
+      ],
+      "id": "6af609a9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def process_items_tuple_set(items_t: tuple[int, int, str], items_s: set[bytes]):\n",
+        "    return items_t, items_s"
+      ],
+      "id": "1f68f3e0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def process_items_dict(prices: dict[str, float]):\n",
+        "    for item_name, item_price in prices.items():\n",
+        "        print(item_name)\n",
+        "        print(item_price)"
+      ],
+      "id": "8fb73f3d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Union and Optional\n",
+        "::: {.callout-note}\n",
+        "Union syntax changed from 3.8+ -> 3.10+\n",
+        ":::"
+      ],
+      "id": "3d10f111"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from typing import Union\n",
+        "\n",
+        "def process_item_union_3_8(item: Union[int, str]):\n",
+        "    print(item)"
+      ],
+      "id": "19a901ff",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def process_item_union_3_10(item: str | int):\n",
+        "    print(item)"
+      ],
+      "id": "240b5dbc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Optional types re-worked in 3.6,  and then later in 3.10\n",
+        "\n",
+        "Optional[Something] is a shortcut for Union[Something,  None]\n",
+        "Or in 3.10, a shortcut for Something | None\n",
+        "\n",
+        "Recommended to use Union over Optional, as Optional isn't *really* optional, it'll just be the value or None, so the intent of Union is slightly clearer."
+      ],
+      "id": "c24430e4"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from typing import Optional\n",
+        "\n",
+        "def say_hi(name: Optional[str] = None):\n",
+        "    if name is not None:\n",
+        "        print(f\"Hey {name}\")\n",
+        "    else:\n",
+        "        print(\"Hello world!\")\n",
+        "\n",
+        "say_hi()\n",
+        "say_hi(\"Jim\")"
+      ],
+      "id": "fcb56979",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "As you can see in this function, name is definitely *not optional* because it raises an error when name is None."
+      ],
+      "id": "ca68db5b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| error: true\n",
+        "def say_hi_not_optional(name: Optional[str]):\n",
+        "    print(f\"Hey {name}!\")\n",
+        "\n",
+        "say_hi_not_optional()"
+      ],
+      "id": "3acf3d2f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Types as classes\n",
+        "We can use Python classes for more explicit (and robust?) type management. Let's say we need to use an object resembling a person in our API.  For now the person will just have a name. \n",
+        "\n",
+        "If done in a .py file, your IDE's autocomplete will kick in and you'll see that 'name' is an available attribute."
+      ],
+      "id": "b56ad6c5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| eval: false\n",
+        "class Person:\n",
+        "    def __init__(self, name):\n",
+        "        self.name = name\n",
+        "\n",
+        "def get_one_person(one_person: Person):\n",
+        "    return one_person."
+      ],
+      "id": "3fda4705",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Pydantic\n",
+        "FastAPI is built around Pydantic objects. Pydantic is an *incredibly* useful library for data validation. "
+      ],
+      "id": "f23e345b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from datetime import datetime\n",
+        "from pydantic import BaseModel"
+      ],
+      "id": "af43cdb1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We're going to create a data model for users with Pydantic (following official docs). Any user should have:\n",
+        "\n",
+        "- id\n",
+        "- name\n",
+        "- signup_ts\n",
+        "- friends"
+      ],
+      "id": "62544f23"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "class User(BaseModel):\n",
+        "    id: int\n",
+        "    name: str = \"Jimmy Riddle\"\n",
+        "    signup_ts: datetime | None = None\n",
+        "    friends: list[int] = []"
+      ],
+      "id": "cfdf31ab",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "When we try to unpack a dictionary, pydantic checks whether the data fits the data model, and raise helpful errors if it does not. If data was validated and the object created, we have a whole host of useful methods for dealing with the outputs."
+      ],
+      "id": "9bdd72aa"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "external_data = {\n",
+        "    \"id\": \"123\",\n",
+        "    \"signup_ts\": \"2017-06-01 12:22\",\n",
+        "    \"friends\": [1, \"2\", b\"3\"],\n",
+        "}\n",
+        "\n",
+        "user1 = User(**external_data)\n",
+        "print(user1.model_dump_json(indent = 2))"
+      ],
+      "id": "fad35abb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "What happens if we fail? We get a nice ValidationError which details which input led to our error."
+      ],
+      "id": "cd4cc148"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| error: true\n",
+        "external_data_error = {\n",
+        "    \"id\": [\"hello\", \"two\"],\n",
+        "    \"signup_ts\": \"2017-06-01 12:22\",\n",
+        "    \"friends\": []\n",
+        "}\n",
+        "\n",
+        "User(**external_data_error)"
+      ],
+      "id": "e49b3bd8",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Type hints with Metadata Annotations\n",
+        "\n",
+        "The syntax is simply: "
+      ],
+      "id": "c3a0a7f2"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from typing import Annotated\n",
+        "\n",
+        "def say_hello(name: Annotated[str, \"Enter full name here separated by a space\"]) -> str:\n",
+        "    return f\"Hello {name}\"\n",
+        "\n",
+        "say_hello(\"Johnny\")"
+      ],
+      "id": "2229cbba",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The tutorial indicates we'll learn how powerful this idea is in a later tutorial.\n",
+        "\n",
+        "FastAPI takes advantage of these type hints to do several things.\n",
+        "\n",
+        "With FastAPI you declare parameters with type hints and you get:\n",
+        "\n",
+        "- **Editor support**.\n",
+        "- **Type checks**.\n",
+        "\n",
+        "...and FastAPI uses the same declarations to:\n",
+        "\n",
+        "Define requirements: from request path parameters, query parameters, headers, bodies, dependencies, etc.\n",
+        "- **Convert data**: from the request to the required type.\n",
+        "- **Validate data**: coming from each request:\n",
+        "    - Generating automatic errors returned to the client when the data is invalid.\n",
+        "\n",
+        "Document the API using OpenAPI:\n",
+        "which is then used by the automatic interactive documentation user interfaces."
+      ],
+      "id": "661ec35e"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
