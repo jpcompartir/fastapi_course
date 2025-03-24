@@ -1,15 +1,13 @@
 ---
-format:
-    html:
-        toc: true
-python3: jupyter
+title: "01 Types Write Up"
 ---
 
 Files etc. for:
 [FastAPI Course Types](https://fastapi.tiangolo.com/python-types/)
 
-
 # Why use type hints?
+Let's see what happens when we don't use type hints:
+
 The get_full_name function is created without type hints. This doesn't stop it working, but it does mean our IDE won't be able to provide us with method hints, and our users won't have direct visibility into how they should use the function.
 ```{python}
 def get_full_name(first_name, last_name):
@@ -19,6 +17,13 @@ def get_full_name(first_name, last_name):
 print(get_full_name("john", "doe"))
 ```
 
+# Types of Types
+
+- **Scalar types**: int, float, bool, bytes
+- **Generic types**: dict, list, set, tuple
+
+
+## Scalar Types
 ```{python}
 def get_full_name(first_name: str, last_name:str):
     full_name = first_name.title() + " " + last_name.title()
@@ -50,14 +55,9 @@ def get_name_with_age(name: str, age:int) -> str:
     return name_with_age
 ```
 
-
-# Types of Types
-
-- **Scalar types**: int, float, bool, bytes
-- **Generic types**: dict, list, set, tuple
-
 Python 3.9+ introduced 'list' (yes, lowercase) type, so no need for `from typing import List` anymore.
 
+## List, Set, Dict, Tuple
 ```{python}
 def process_items_list(items: list[str]):
     for item in items:
@@ -65,7 +65,6 @@ def process_items_list(items: list[str]):
 
 ```
 
-# Same for sets and tuples
 ```{python}
 def process_items_tuple_set(items_t: tuple[int, int, str], items_s: set[bytes]):
     return items_t, items_s
@@ -78,6 +77,8 @@ def process_items_dict(prices: dict[str, float]):
         print(item_price)
 ```
 
+
+## Union and Optional
 ::: {.callout-note}
 Union syntax changed from 3.8+ -> 3.10+
 :::
@@ -124,3 +125,96 @@ def say_hi_not_optional(name: Optional[str]):
 
 say_hi_not_optional()
 ```
+
+
+# Types as classes
+We can use Python classes for more explicit (and robust?) type management. Let's say we need to use an object resembling a person in our API.  For now the person will just have a name. 
+
+If done in a .py file, your IDE's autocomplete will kick in and you'll see that 'name' is an available attribute.
+
+```{python}
+#| eval: false
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+def get_one_person(one_person: Person):
+    return one_person.
+```
+
+## Pydantic
+FastAPI is built around Pydantic objects. Pydantic is an *incredibly* useful library for data validation. 
+```{python}
+from datetime import datetime
+from pydantic import BaseModel
+```
+
+We're going to create a data model for users with Pydantic (following official docs). Any user should have:
+
+- id
+- name
+- signup_ts
+- friends
+
+```{python}
+class User(BaseModel):
+    id: int
+    name: str = "Jimmy Riddle"
+    signup_ts: datetime | None = None
+    friends: list[int] = []
+```
+
+When we try to unpack a dictionary, pydantic checks whether the data fits the data model, and raise helpful errors if it does not. If data was validated and the object created, we have a whole host of useful methods for dealing with the outputs.
+```{python}
+external_data = {
+    "id": "123",
+    "signup_ts": "2017-06-01 12:22",
+    "friends": [1, "2", b"3"],
+}
+
+user1 = User(**external_data)
+print(user1.model_dump_json(indent = 2))
+```
+
+What happens if we fail? We get a nice ValidationError which details which input led to our error.
+```{python}
+#| error: true
+external_data_error = {
+    "id": ["hello", "two"],
+    "signup_ts": "2017-06-01 12:22",
+    "friends": []
+}
+
+User(**external_data_error)
+```
+
+# Type hints with Metadata Annotations
+
+The syntax is simply: 
+```{python}
+from typing import Annotated
+
+def say_hello(name: Annotated[str, "Enter full name here separated by a space"]) -> str:
+    return f"Hello {name}"
+
+say_hello("Johnny")
+```
+
+The tutorial indicates we'll learn how powerful this idea is in a later tutorial.
+
+FastAPI takes advantage of these type hints to do several things.
+
+With FastAPI you declare parameters with type hints and you get:
+
+- **Editor support**.
+- **Type checks**.
+
+...and FastAPI uses the same declarations to:
+
+Define requirements: from request path parameters, query parameters, headers, bodies, dependencies, etc.
+- **Convert data**: from the request to the required type.
+- **Validate data**: coming from each request:
+    - Generating automatic errors returned to the client when the data is invalid.
+
+Document the API using OpenAPI:
+which is then used by the automatic interactive documentation user interfaces.

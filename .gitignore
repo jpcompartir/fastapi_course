@@ -141,3 +141,4 @@ cython_debug/
 *.js
 *.css
 *.html
+/.quarto/
