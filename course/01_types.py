@@ -9,5 +9,85 @@ Adding type hints makes IDEs and their autocorrects more useful.
 """
 def get_full_name(first_name: str, last_name:str):
     full_name = first_name.title() + " " + last_name.title()
-    
+
     return full_name
+
+
+"""
+If you're not getting error analysis for this function, add the following lines to your settings.json:
+"python.analysis.typeCheckingMode": "basic",
+"python.linting.enabled": true
+
+This will then anticipate an error before runtime of your function, telling you that this operation won't work with types str and int.
+"""
+def get_name_with_age(name: str, age: int):
+    name_with_age = name + " is this old: " + age
+    return name_with_age
+
+get_name_with_age("john", 10)
+
+def get_name_with_age(name: str, age:int) -> str:
+    name_with_age = name + " is this old: " + str(age)
+    return name_with_age
+
+
+"""
+Scalar types: int, float, bool, bytes
+Generic types: dict, list, set, tuple
+
+Python 3.9+ introduce 'list' type, so no neee for from typing import List anymore.
+"""
+def process_items_list(items: list[str]):
+    for item in items:
+        print(item)
+
+
+# Same for sets and tuples
+def process_items_tuple_set(items_t: tuple[int, int, str], items_s: set[bytes]):
+    return items_t, items_s
+
+
+def process_items_dict(prices: dict[str, float]):
+    for item_name, item_price in prices.items():
+        print(item_name)
+        print(item_price)
+
+
+
+"""
+Union syntax changed from 3.8+ -> 3.10+
+"""
+from typing import Union
+
+def process_item_union_3_8(item: Union[int, str]):
+    print(item)
+
+def process_item_union_3_10(item: str | int):
+    print(item)
+
+"""
+Optional types re-worked in 3.6,  and then later in 3.10
+
+Optional[Something] is a shortcut for Union[Something,  None]
+Or in 3.10, a shortcut for Something | None
+
+FastAPI recommend Union over Optional, as Optional isn't *really* optional, it'll just be the value or None, so the intent of Union is slightly clearer.
+"""
+from typing import Optional
+
+def say_hi(name: Optional[str] = None):
+    if name is not None:
+        print(f"Hey {name}")
+    else:
+        print("Hello world!")
+
+say_hi()
+say_hi("Jim")
+
+
+"""
+As you can see in this function, name is definitely *not optional* because it raises an error when name is None.
+"""
+def say_hi_not_optional(name: Optional[str]):
+    print(f"Hey {name}!")
+
