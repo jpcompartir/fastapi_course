@@ -1,0 +1,36 @@
+
+# Concurrency
+
+Asynchronous code allows us to tell the computer to do something else whilst it waits for another operation to finish, i.e. other code can execute whilst something is happening 'in the background'. This is useful when we have long-running snippets of code which aren't computationally heavy enough to need us to dictate all of our computation to them. Or while we're waiting for a response from a web server etc.
+
+In Python we now have the `await` & `async def` keywords for asynchronous code.
+
+::: {.callout-tip}
+Don't confuse concurrent programming with parallel programming, they are 'similar' in some respects but they are not the same thing.
+:::
+
+The `await` and `async def` keywords go together - neither work without the other.
+```{python}
+#| eval: false
+burgers = await get_burgers(2)
+
+async def get_burgers(number: int)
+    return burgers
+
+# 'path operation function'
+@app.get('/burgers')
+async def read_burgers():
+    burgers = await get_burgers(2)
+    return burgers
+```
+
+
+::: {.callout-tip}
+When the path operation function is `async def`, FastAPI knows how to handle the rest of the concurrency.
+:::
+
+# Coroutines
+
+Coroutine is just the very fancy term for the thing returned by an async def function. Python knows that it is something like a function, that it can start and that it will end at some point, but that it might be paused internally too, whenever there is an await inside of it.
+
+But all this functionality of using asynchronous code with async and await is many times summarised as using "coroutines". It is comparable to the main key feature of Go, the "Goroutines".

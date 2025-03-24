@@ -1,0 +1,13 @@
+Environment Variables live outside of the Python interpreter's scope, they are available to the system. 
+
+In the terminal we create them with `export` and then view them with `echo`.
+
+In python we use `os` and `.getenv()`
+
+::: {.callout-tip}
+Second arg to `os.getenv()` is the default value, i.e. if environment variable not set return this value.
+:::
+
+As all environment variables are handled outside of Python, they are strings - so that other programs can handle them. Applications/programs need to take care of any type conversion.
+
+Nothing else of note, really.
