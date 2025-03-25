@@ -1,3 +1,8 @@
+---
+execute:
+    eval: false
+---
+
 # Creating a basic API
 
 ::: {.callout-tip}
@@ -51,3 +56,144 @@ def root():
 ```bash
 fastapi dev main.py
 ```
+
+View the docs, schema etc. at various locations. (http://127.0.0.1:8000/docs) for generated docs with Swagger UI, (http://127.0.0.1:8000/redoc) for redoc  
+
+For example, we can get a full OpenAPI spec of a response at `http://127.0.0.1:8000/openapi.json`
+```
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+# Path parameters
+
+Path parameters, or variables, are defined with python formatted string syntax.
+The order also matters, so we need to put users/me/ before user/{user_id} if we want to reduce the possibility of a collision. 
+```{python}
+#| eval: false
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/users/me")
+async def read_current_user():
+    return {"user_id": "current user"}
+
+@app.get("/users/{user_id}")
+async def read_user(user_id: str):
+    return {"user_id": user_id}
+
+```
+
+
+
+Own example - fill out the response slightly, we search on ID and then return the name and ID of the building
+
+```{python}
+from fastatpi import FastAPI
+
+app = FastAPI()
+
+@app.get("/buildings/{building_id}")
+async def get_building(building_id: int):
+    building_dict = {
+        1: "Eiffel Tower",
+        2: "Empire State Building"
+    }
+    response = {
+        "Building ID": building_id,
+        "Building Name": building_dict[building_id]
+    }
+```
+
+If we were to call a request looking for the building id = 2, we would get:
+
+<pre>
+{
+  "building_id": 2,
+  "building_name": "Empire State Building"
+}
+</pre>
+
+# Paths cannot be re-defined
+
+Furthermore, paths cannot be re-used. In the following app, the /buildings endpoint/path will always return 'Empire State Building', because it was defined first and paths cannot be re-used/re-defined.
+
+```{python}
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/buildings")
+async def return_empire_state():
+    return {"building_name": "Empire State Building"}
+
+
+@app.get("/buildings")
+async def return_eiffel_tower():
+    return {"building_name": "Eiffel Tower"}
+
+    
+```
+
+If we had our API served at 127.0.0.1:8000,  http://127.0.0.1:8000/buildings would always return:
+<pre>
+{
+  "building_name": "Empire State Building"
+}
+</pre>
+
+
+Can spice this up a bit by adding a building lookup. We could then visit the docs at:
+`http://127.0.0.1:8000/docs#/default/get_building_buildings__building_name__get` and we can see the possible enumerated values, and we can check the API responses.
+```{python}
+from fastapi import FastAPI
+from enum import Enum
+from typing import Dict, Any
+
+app = FastAPI()
+
+class BuildingName(str, Enum):
+    empire = "Empire State Building"
+    eiffel = "Eiffel Tower"
+    liberty = "Statue of Liberty"
+
+building_info_dict: Dict[BuildingName, Dict[str, Any]] = {
+    BuildingName.empire: {"location": "New York, USA", "height": "381m"},
+    BuildingName.eiffel: {"location": "Paris, France", "height": "330m"},
+    BuildingName.liberty: {"location": "New York, USA", "height": "93m"}
+}
+
+@app.get("/buildings/{building_name}")
+async def get_building(building_name: BuildingName):
+    if building_name in building_info_dict:
+        return {"name": building_name,
+                **building_info_dict[building_name]}
+```
+
