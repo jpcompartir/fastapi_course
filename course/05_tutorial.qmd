@@ -141,7 +141,7 @@ If we were to call a request looking for the building id = 2, we would get:
 }
 </pre>
 
-# Paths cannot be re-defined
+## Paths cannot be re-defined
 
 Furthermore, paths cannot be re-used. In the following app, the /buildings endpoint/path will always return 'Empire State Building', because it was defined first and paths cannot be re-used/re-defined.
 
@@ -196,4 +196,6 @@ async def get_building(building_name: BuildingName):
         return {"name": building_name,
                 **building_info_dict[building_name]}
 ```
+
+# Query Parameters
 

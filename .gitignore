@@ -142,3 +142,4 @@ cython_debug/
 *.css
 *.html
 /.quarto/
+*_ipynb

@@ -15,6 +15,10 @@ building_info_dict: Dict[BuildingName, Dict[str, Any]] = {
     BuildingName.liberty: {"location": "New York, USA", "height": "93m"}
 }
 
+@app.get("/buildings")
+async def list_buildings():
+    return [{"id": b.name, "name": b.value} for b in BuildingName]
+
 @app.get("/buildings/{building_name}")
 async def get_building(building_name: BuildingName):
     if building_name in building_info_dict:
